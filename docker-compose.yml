@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  chatbot_parser:
+    build: ./chatbot_parser
+    ports:
+      - "5050:5050"
+
+  shrug_command:
+    build: ./shrug_command
+    ports:
+      - "6060:6060"
+
+  postgres_container:
+    image: postgres:13
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: chatbot
+      POSTGRES_PASSWORD: chatbot_password
+      POSTGRES_DB: chatbot
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  email_service:
+    build: ./email_service
+    command: python email_service.py
+    environment:
+        - SENDGRID_API_KEY=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
+        - FROM_EMAIL=ayusuf@berkeley.edu
+    ports:
+        - "5051:5051"
+
